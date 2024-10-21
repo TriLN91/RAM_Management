@@ -8,13 +8,16 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.stream.Collectors;
 import utilites.Validation;
 
 public class RAMManagementSystem {
+    // private static List<RAM> ramList = new ArrayList<>();
     private final Map<String, RAM> ramItems = new HashMap<>();
     private static final String FILE_NAME = "RAMModules.dat";
     public static Scanner sc = new Scanner(System.in);
@@ -26,9 +29,13 @@ public class RAMManagementSystem {
 
     public void addRAMItem(){
 
-        String code = Validation.validCode(ramItems);
-        String[] value = code.split("_");
-        String type = value[0].substring(3);
+        String baseCode = Validation.validBaseCode();
+        int count = (int) ramItems.keySet().stream()
+                    .filter(code -> code.startsWith(baseCode))
+                    .count();
+        String code = baseCode + "_" + (count + 1);
+        
+        String type = baseCode.substring(3);
         String bus = Validation.validBus();
         String brand = Validation.validBrand();
         int quantity = Validation.validQuantity();
@@ -36,6 +43,7 @@ public class RAMManagementSystem {
         boolean active = true;
         
         RAM newRam = new RAM(code, type, bus, brand, quantity, productMonthYear, active);
+        // ramList.add(newRam);
         ramItems.put(code, newRam);   
         System.out.println("RAM item added successfully.");
     }
@@ -209,9 +217,14 @@ public class RAMManagementSystem {
         System.out.print("Enter new Type: ");
         String newType = sc.nextLine().trim().toUpperCase();
         if(!newType.isEmpty()){
+            ramItems.remove(code);
+            String baseCode = "RAM" +newType;
+            int count = (int) ramItems.keySet().stream()
+                .filter(c -> c.startsWith(baseCode))
+                .count();
+            String newCode = baseCode + "_" + (count + 1);
             ram.setType(newType);
-            String[] olderRAM = ram.getCode().split("_");
-            ram.setCode("RAM"+ newType + "_" + olderRAM[1]);
+            ram.setCode(newCode);
         }
 
         System.out.print("Enter new bus: ");
@@ -246,16 +259,19 @@ public class RAMManagementSystem {
             }
         }
 
-        // System.out.println("Update active: ");
-        // String newActive = sc.nextLine().trim().toLowerCase();
-        // if(!newActive.isEmpty()){
-        //     if("true".equalsIgnoreCase(newActive)){
-        //         ram.setActive(true);
-        //     }
-        //     if("false".equalsIgnoreCase(newActive)){
-        //         ram.setActive(false);
-        //     }
-        // }
+        if(!ram.isActive()){
+            System.out.println("Update active to true. ");
+            System.out.println("Yes/No: ");
+            String newActive = sc.nextLine().trim().toLowerCase();
+            if(!newActive.isEmpty()){
+                if("yes".equalsIgnoreCase(newActive)){
+                    ram.setActive(true);
+                    System.out.println("RAM is already active.");
+                }
+            }
+        }
+
+        
 
 
         System.out.println("Update successfully!");
@@ -281,16 +297,30 @@ public class RAMManagementSystem {
     }
 
     public void showAllItems(){
+        
+        List<RAM> sortedRAMList = ramItems.values().stream()
+            .sorted(Comparator.comparing(RAM::getType)
+                    .thenComparing(RAM::getBus)
+                    .thenComparing(RAM::getBrand))
+            .collect(Collectors.toList());
 
         System.out.println("");
         System.out.printf("%-15s %-10s %-10s %-15s %-18s %-10s %-10s\n", "Code", "Type", "Bus", "Brand", "ProductDate", "Quantity", "Active");
         
-        for(RAM ram : ramItems.values()){
+        for(RAM ram : sortedRAMList){
             if(ram.isActive()){
-                System.out.printf("%-15s %-10s %-10s %-15s %-18s %-10s %-10s\n", ram.getCode(), ram.getType(), ram.getBus()+"MHz", ram.getBrand(), ram.getProductionMonthYear(), ram.getQuantity(), ram.isActive());
+                System.out.printf("%-15s %-10s %-10s %-15s %-18s %-10s %-10s\n", 
+                ram.getCode(), 
+                ram.getType(), 
+                ram.getBus()+"MHz", 
+                ram.getBrand(), 
+                ram.getProductionMonthYear(), 
+                ram.getQuantity(), 
+                ram.isActive());
             }
             
         }
+        System.out.println("");
     }
 
     
@@ -319,18 +349,16 @@ public class RAMManagementSystem {
         }
     }
 
-    // public void saveToFile() {
-    //     try (BufferedWriter writer = new BufferedWriter(new FileWriter("src\\Model\\RAMModules.dat", true))) { 
-    //         for (RAM ram : ramItems.values()) {
-    //             writer.write(ram.getCode() + "," + ram.getType() + "," + ram.getBus() + "," + ram.getBrand() + "," + ram.getQuantity() + "," + ram.getProductionMonthYear() + "," + ram.isActive());
-    //             writer.newLine(); 
-    //         }
-    //         System.out.println("RAM items have been successfully saved to RAMModules.dat");
-    //     } catch (IOException e) {
-    //         System.out.println("Error saving RAM items to file: " + e.getMessage());
-    //         e.printStackTrace();
-    //     }
-    // }
-
+  
+    public void clearFile(){
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("src\\Model\\RAMModules.dat"))) {
+            // Ghi một Map trống vào file để xóa toàn bộ dữ liệu cũ
+            Map<String, RAM> emptyMap = new HashMap<>();
+            oos.writeObject(emptyMap);
+            System.out.println("All data has been cleared from RAMModules.dat.");
+        } catch (IOException e) {
+            System.out.println("Error clearing the file: " + e.getMessage());
+        }
+    }
     
 }

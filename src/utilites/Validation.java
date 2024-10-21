@@ -26,33 +26,27 @@ public class Validation {
         return ram.containsKey(code);
     }
 
-    public static String validCode(Map<String, RAM> ram){
-        String code;
+    
+    public static String validBaseCode(){
+        String baseCode;
         boolean validInput = false;
         do { 
-            System.out.print("Enter code: ");
-            code = sc.nextLine().trim();
-            if(code.isEmpty()){
-                System.out.println("Input cannot be empty. Please try again");
+            System.out.print("Enter base code: ");
+            baseCode = sc.nextLine().trim();
+            if(baseCode.isEmpty()){
+                System.out.println("Input cannot be empty. Please try again.");
                 continue;
             }
-
-            String pattern = "RAM[A-Z0-9]+_\\d+";
-            if(!code.matches(pattern)){
-                System.out.println("Code is wrong format (RAM[x]_[y])!");
-                
+    
+            String pattern = "RAM[A-Z0-9]+"; 
+            if(!baseCode.matches(pattern)){
+                System.out.println("Base code is wrong format (RAMx where x is the type)!");
                 continue;
             }
-
-            if(existCode(code,ram)){
-                System.out.println("Product ID already in the system");
-                continue;
-            }
-
+    
             validInput = true;
-
         } while (!validInput);
-        return code;
+        return baseCode;
     }
 
     public static String validCodeUpdate( Map<String, RAM> ram){

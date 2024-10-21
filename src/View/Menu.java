@@ -6,6 +6,7 @@ import java.util.Scanner;
 public class Menu {
     public static Scanner sc = new Scanner(System.in);
     
+    
 
     public static void display(int order, String x){
         if(order == 1){
@@ -17,7 +18,7 @@ public class Menu {
             System.out.println("3. Update RAM Item Information.                                      ");
             System.out.println("4. Delete RAM Item.                                                  ");
             System.out.println("5. Show All RAM Items.                                               ");
-            System.out.println("6. Store Data to Files .                                             ");
+            System.out.println("6. Save to File.                                             ");
             System.out.println("7. Exist.                                                            ");
             System.out.print("Your choice: ");
 
@@ -32,110 +33,92 @@ public class Menu {
         }
     }
 
+    
+
     public static void displayMenu(){
-        
-        RAMManagementSystem ramMS = new RAMManagementSystem();
-        int choice;
-        String tail,temp;
-        boolean checkAction = true;
-        do { 
-            display(1, "");
-            choice = sc.nextInt();
-            tail = sc.nextLine().trim();
-            
-            switch (choice) {
-                case 1:{
-                    boolean checkRespond = true;
-                    do { 
-                        ramMS.addRAMItem();
-                        display(2, "add Item other");
-                        String respond = sc.nextLine().trim();
-                        if ("2".equalsIgnoreCase(respond)) {
-                            continue;
-                        }
-                        checkRespond = false;
-                        
-                    } while (checkRespond);
-                    displayMenu();
-                    
+    
+    RAMManagementSystem ramMS = new RAMManagementSystem();
+    
+    int choice;
+    boolean checkAction = true;
+    do { 
+        display(1, "");
+        choice = sc.nextInt();
+        sc.nextLine(); 
+        System.out.println("");
 
-                }
-                    break;
+        switch (choice) {
+            case 1:
+                do {
+                    ramMS.addRAMItem(); // Thực hiện thêm RAM item
+                    display(2, "add another RAM item."); // Hỏi người dùng có muốn tiếp tục không
+                    String respond = sc.nextLine().trim();
+                    if ("1".equals(respond)) {
+                        break; // Trở về menu chính
+                    }
+                } while (true); // Tiếp tục lặp nếu người dùng chọn tiếp tục thêm item
+                break;
 
-                case 2:{
-                    // boolean checkRespond = true;
-                    // do { 
-                    //     ramMS.searchRAMItem();
-                    //     display(2, "add Item other");
-                    //     String respond = sc.nextLine().trim();
-                    //     if ("yes".equalsIgnoreCase(respond)) {
-                    //         continue;
-                    //     }
-                    //     checkRespond = false;
-                        
-                    // } while (checkRespond);
-                    ramMS.searchRAMItem();
-                    displayMenu();
-                    
-                }
-                    break;
+            case 2:
+                do {
+                    ramMS.searchRAMItem(); // Thực hiện tìm kiếm RAM
+                    display(2, "search for another RAM item."); // Hỏi người dùng có muốn tiếp tục không
+                    String respond = sc.nextLine().trim();
+                    if ("1".equals(respond)) {
+                        break; // Trở về menu chính
+                    }
+                } while (true); // Tiếp tục lặp nếu người dùng chọn tiếp tục tìm kiếm
+                break;
 
-                case 3:{
-                    boolean checkRespond = true;
-                    do { 
-                        ramMS.updateRAMItem();
-                        display(2, "update Item information other");
-                        String respond = sc.nextLine().trim();
-                        if ("yes".equalsIgnoreCase(respond)) {
-                            continue;
-                        }
-                        checkRespond = false;
-                        
-                    } while (checkRespond);
-                    displayMenu();
+            case 3:
+                do {
+                    ramMS.updateRAMItem(); // Thực hiện cập nhật RAM
+                    display(2, "update another RAM item."); // Hỏi người dùng có muốn tiếp tục không
+                    String respond = sc.nextLine().trim();
+                    if ("1".equals(respond)) {
+                        break; // Trở về menu chính
+                    }
+                } while (true); // Tiếp tục lặp nếu người dùng chọn tiếp tục cập nhật
+                break;
 
-                }
-                    break;
+            case 4:
+                do {
+                    ramMS.deleteRAMItem(); // Thực hiện xóa RAM
+                    display(2, "delete another RAM item."); // Hỏi người dùng có muốn tiếp tục không
+                    String respond = sc.nextLine().trim();
+                    if ("1".equals(respond)) {
+                        break; // Trở về menu chính
+                    }
+                } while (true); // Tiếp tục lặp nếu người dùng chọn tiếp tục xóa
+                break;
+            case 5:
+                ramMS.showAllItems();
+                break;
 
-                case 4:{
-                    boolean checkRespond = true;
-                    do { 
-                        ramMS.deleteRAMItem();
-                        display(2, "delete Item other");
-                        String respond = sc.nextLine().trim();
-                        if ("yes".equalsIgnoreCase(respond)) {
-                            continue;
-                        }
-                        checkRespond = false;
-                        
-                    } while (checkRespond);
-                    displayMenu();
-                    
-                }
-                    break;
-
-                case 5:{
-                    ramMS.showAllItems();
-                    displayMenu();
-
-                }
-                    break;
-
-                case 6:{
-                    ramMS.saveToFile();
-                    displayMenu();
-                    
-                }
-                    break;
-
-                
-                default:
-                    throw new AssertionError();
-            }
-            if(choice >=6 && choice <=1 ){
+            case 6:
                 ramMS.saveToFile();
+                ramMS.loadFromFile();
+                break;
+
+            case 7:
+                
                 checkAction = false;
-            }
-        } while (checkAction);
-    }
+                break;
+
+            default:
+                System.out.println("Invalid choice. Please try again.");
+        }
+
+        
+        // if (choice > 7 && choice < 1) {
+        //     checkAction = false;
+        //     ramMS.saveToFile();
+        // }
+
+    } while (checkAction);
+    
+    // Lưu dữ liệu trước khi thoát chương trình
+    ramMS.saveToFile();
+    System.out.println("Exiting program. Data saved.");
+}
 }
