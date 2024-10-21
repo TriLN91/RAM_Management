@@ -27,7 +27,8 @@ public class RAMManagementSystem {
     public void addRAMItem(){
 
         String code = Validation.validCode(ramItems);
-        String type = code.split("_")[0].substring(3);
+        String[] value = code.split("_");
+        String type = value[0].substring(3);
         String bus = Validation.validBus();
         String brand = Validation.validBrand();
         int quantity = Validation.validQuantity();
@@ -168,7 +169,7 @@ public class RAMManagementSystem {
                 System.out.printf("%-15s %-15s %-18s %-10s\n", "Code", "Bus", "ProductDateTime", "Quantity");
                 
                 for (RAM ram : list) {
-                    System.out.printf("%-15s %-15s %-18s %-10d\n", ram.getCode(), ram.getBus(), ram.getProductionMonthYear(), ram.getQuantity());
+                    System.out.printf("%-15s %-15s %-18s %-10d\n", ram.getCode(), ram.getBus() + "MHz", ram.getProductionMonthYear(), ram.getQuantity());
                     System.out.println("");
                 }
                 System.out.println("Do you want to search next time?");
@@ -286,7 +287,7 @@ public class RAMManagementSystem {
         
         for(RAM ram : ramItems.values()){
             if(ram.isActive()){
-                System.out.printf("%-15s %-10s %-10s %-15s %-18s %-10s %-10s\n", ram.getCode(), ram.getType(), ram.getBus(), ram.getBrand(), ram.getProductionMonthYear(), ram.getQuantity(), ram.isActive());
+                System.out.printf("%-15s %-10s %-10s %-15s %-18s %-10s %-10s\n", ram.getCode(), ram.getType(), ram.getBus()+"MHz", ram.getBrand(), ram.getProductionMonthYear(), ram.getQuantity(), ram.isActive());
             }
             
         }
@@ -317,6 +318,19 @@ public class RAMManagementSystem {
             System.out.println("Error saving RAM items to file: " + e.getMessage());
         }
     }
+
+    // public void saveToFile() {
+    //     try (BufferedWriter writer = new BufferedWriter(new FileWriter("src\\Model\\RAMModules.dat", true))) { 
+    //         for (RAM ram : ramItems.values()) {
+    //             writer.write(ram.getCode() + "," + ram.getType() + "," + ram.getBus() + "," + ram.getBrand() + "," + ram.getQuantity() + "," + ram.getProductionMonthYear() + "," + ram.isActive());
+    //             writer.newLine(); 
+    //         }
+    //         System.out.println("RAM items have been successfully saved to RAMModules.dat");
+    //     } catch (IOException e) {
+    //         System.out.println("Error saving RAM items to file: " + e.getMessage());
+    //         e.printStackTrace();
+    //     }
+    // }
 
     
 }
